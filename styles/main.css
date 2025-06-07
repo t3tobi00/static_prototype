@@ -161,6 +161,51 @@ body {
     max-height: 400px;
 }
 
+/* Results inside chat messages */
+.results-message .message-content {
+    padding: 16px 20px;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px 12px 12px 4px;
+    margin-right: 20px;
+}
+
+.chat-results-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.chat-results-container .result-card {
+    margin-bottom: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.chat-results-container .card-image {
+    height: 120px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.chat-results-container .card-title {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.chat-results-container .card-description {
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.chat-results-container .export-to-plan-button {
+    margin-top: 8px;
+    font-size: 11px;
+    padding: 6px 12px;
+}
+
 .chat-message {
     margin-bottom: 16px;
     animation: messageSlideIn 0.3s ease-out;

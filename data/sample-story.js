@@ -27,10 +27,10 @@ const sampleStory = {
         },
         {
             action: "hideAiThinking"
-        },
-        {
+        },        {
             action: "showSidebarWithResults",
-            resultsDataKey: "activityResults"
+            resultsDataKey: "activityResults",
+            message: "I found some great options for your mountain getaway! Here are the best activities I discovered:"
         },
         {
             action: "simulateUserClick",
@@ -43,14 +43,18 @@ const sampleStory = {
         },        {
             action: "wait",
             duration: 1500
-        },
-        {
+        },        {
             action: "showConfirmationDialog",
-            message: "I can generate a detailed template with sub-branches for your mountain getaway plan. Would you like me to create that for you?"
+            message: "I can generate a detailed template with sub-branches for your mountain getaway plan. Would you like me to create that for you?",
+            confirmationResponses: {
+                yes: "Perfect! Let me generate a detailed template for your mountain getaway plan.",
+                no: "No problem! Your current plan looks great as is."
+            }
         },
         {
             action: "showTemplateGenerationEffect",
-            targetBranchId: "b0"
+            targetBranchId: "b0",
+            message: "I'm analyzing your plan structure and generating comprehensive sub-branches with activities, logistics, and timing details..."
         },
         {
             action: "agentGenerateTemplate",

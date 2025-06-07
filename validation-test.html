@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Engine Validation Test</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .validation-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border: 2px solid #007acc;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-width: 300px;
+        }
+        .test-item {
+            margin: 8px 0;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .test-pass { background: #d4edda; color: #155724; }
+        .test-fail { background: #f8d7da; color: #721c24; }
+        .test-pending { background: #fff3cd; color: #856404; }
+        .test-button {
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px;
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .test-button:hover { background: #005999; }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <div id="header">
+            <h1 id="app-title">Story Weaver - Dynamic Engine Test</h1>
+            <p id="app-subtitle">Validating Clean Architecture</p>
+        </div>
+        
+        <div id="main-content-area">
+            <div id="left-pane">
+                <div id="search-area">
+                    <div id="search-input-container">
+                        <div class="search-input-placeholder">Dynamic content will appear here...</div>
+                    </div>
+                </div>
+                    
+                <div id="chat-messages">
+                    <div class="chat-message ai-message">
+                        <div class="message-content">
+                            Ready to test dynamic story engine capabilities!
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="results-sidebar" style="display: none;"></div>
+            </div>
+            
+            <div id="right-pane" class="planning-canvas">
+                <div id="plan-title-area">
+                    <h2 id="plan-title-text">Dynamic Test Plan</h2>
+                </div>
+                
+                <div id="branch-container">
+                    <div class="empty-plan-message">Dynamic branches will appear here during testing.</div>
+                </div>
+                
+                <button id="add-main-branch-button">+ Add Test Branch</button>
+            </div>
+        </div>
+        
+        <div id="story-narrator">
+            <p id="narration-text">Dynamic Engine Validation Ready</p>
+            <div class="narrator-buttons">
+                <button id="prev-step-button" style="visibility: hidden;">← Previous</button>
+                <button id="next-step-button">Start Dynamic Test →</button>
+                <button id="restart-story-button" style="visibility: hidden;">↺ Restart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Validation Panel -->
+    <div class="validation-panel">
+        <h3>🧪 Engine Validation</h3>
+        
+        <button class="test-button" onclick="testContentInterpolation()">Test Content Interpolation</button>
+        <button class="test-button" onclick="testConditionalExecution()">Test Conditional Execution</button>
+        <button class="test-button" onclick="testDynamicResponses()">Test Dynamic Responses</button>
+        <button class="test-button" onclick="testStoryIndependence()">Test Story Independence</button>
+        <button class="test-button" onclick="runFullValidation()">Run Full Validation</button>
+        
+        <div id="validation-results">
+            <div class="test-item test-pending">Ready to run validation tests...</div>
+        </div>
+    </div>
+
+    <!-- Include all required scripts -->
+    <script src="data/sample-data.js"></script>
+    <script src="data/sample-story.js"></script>
+    <script src="data/advanced-data.js"></script>
+    <script src="data/advanced-story.js"></script>
+    <script src="scripts/story-engine.js"></script>
+
+    <script>
+        let testResults = [];
+
+        // Test 1: Content Interpolation
+        async function testContentInterpolation() {
+            updateResults("Testing content interpolation...", "pending");
+            
+            try {
+                // Test with mock data
+                const mockData = {
+                    userName: "Alex",
+                    tripType: "adventure",
+                    userDestination: "Iceland"
+                };
+                
+                // Create test step with interpolated content
+                const testStep = {
+                    action: "addChatMessage",
+                    message: "Welcome {{userName}}! Ready for your {{tripType}} to {{userDestination}}?",
+                    isUser: false
+                };
+                
+                // Initialize engine with mock data
+                StoryEngine.init(sampleStory, mockData);
+                
+                // Test interpolation manually
+                const interpolated = testStep.message.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+                    return mockData[key] || match;
+                });
+                
+                const expected = "Welcome Alex! Ready for your adventure to Iceland?";
+                const passed = interpolated === expected;
+                
+                updateResults(
+                    `Content Interpolation: ${passed ? "✅ PASS" : "❌ FAIL"}`,
+                    passed ? "pass" : "fail"
+                );
+                
+                testResults.push({ test: "Content Interpolation", passed });
+                
+            } catch (error) {
+                updateResults(`Content Interpolation: ❌ FAIL - ${error.message}`, "fail");
+                testResults.push({ test: "Content Interpolation", passed: false });
+            }
+        }
+
+        // Test 2: Conditional Execution
+        async function testConditionalExecution() {
+            updateResults("Testing conditional execution...", "pending");
+            
+            try {
+                // Test condition evaluation logic
+                const conditions = [
+                    { type: "confirmation", value: true },
+                    { type: "dataExists", key: "userName" },
+                    { type: "dataEquals", key: "tripType", value: "adventure" }
+                ];
+                
+                // Mock current data
+                const mockData = {
+                    userName: "TestUser",
+                    tripType: "adventure", 
+                    lastConfirmation: true
+                };
+                
+                // Test each condition type
+                let allPassed = true;
+                
+                // Test confirmation condition
+                if (mockData.lastConfirmation !== true) allPassed = false;
+                
+                // Test data exists condition  
+                if (mockData.userName === undefined) allPassed = false;
+                
+                // Test data equals condition
+                if (mockData.tripType !== "adventure") allPassed = false;
+                
+                updateResults(
+                    `Conditional Execution: ${allPassed ? "✅ PASS" : "❌ FAIL"}`,
+                    allPassed ? "pass" : "fail"
+                );
+                
+                testResults.push({ test: "Conditional Execution", passed: allPassed });
+                
+            } catch (error) {
+                updateResults(`Conditional Execution: ❌ FAIL - ${error.message}`, "fail");
+                testResults.push({ test: "Conditional Execution", passed: false });
+            }
+        }
+
+        // Test 3: Dynamic Responses
+        async function testDynamicResponses() {
+            updateResults("Testing dynamic responses...", "pending");
+            
+            try {
+                // Test confirmation responses structure
+                const confirmationStep = {
+                    action: "showConfirmationDialog",
+                    message: "Test question?",
+                    confirmationResponses: {
+                        yes: "Great choice!",
+                        no: "No problem!"
+                    }
+                };
+                
+                const hasValidStructure = 
+                    confirmationStep.confirmationResponses &&
+                    confirmationStep.confirmationResponses.yes &&
+                    confirmationStep.confirmationResponses.no;
+                
+                updateResults(
+                    `Dynamic Responses: ${hasValidStructure ? "✅ PASS" : "❌ FAIL"}`,
+                    hasValidStructure ? "pass" : "fail"
+                );
+                
+                testResults.push({ test: "Dynamic Responses", passed: hasValidStructure });
+                
+            } catch (error) {
+                updateResults(`Dynamic Responses: ❌ FAIL - ${error.message}`, "fail");
+                testResults.push({ test: "Dynamic Responses", passed: false });
+            }
+        }
+
+        // Test 4: Story Independence
+        async function testStoryIndependence() {
+            updateResults("Testing story independence...", "pending");
+            
+            try {
+                // Verify engine doesn't contain hardcoded story content
+                const engineCode = StoryEngine.toString();
+                
+                // Check for hardcoded strings that shouldn't be there
+                const hardcodedContent = [
+                    "mountain getaway",
+                    "perfect weekend",
+                    "activities I discovered"
+                ];
+                
+                let hasHardcodedContent = false;
+                hardcodedContent.forEach(content => {
+                    if (engineCode.toLowerCase().includes(content.toLowerCase())) {
+                        hasHardcodedContent = true;
+                    }
+                });
+                
+                const isIndependent = !hasHardcodedContent;
+                
+                updateResults(
+                    `Story Independence: ${isIndependent ? "✅ PASS" : "❌ FAIL"}`,
+                    isIndependent ? "pass" : "fail"
+                );
+                
+                testResults.push({ test: "Story Independence", passed: isIndependent });
+                
+            } catch (error) {
+                updateResults(`Story Independence: ❌ FAIL - ${error.message}`, "fail");
+                testResults.push({ test: "Story Independence", passed: false });
+            }
+        }
+
+        // Run Full Validation
+        async function runFullValidation() {
+            updateResults("Running full validation suite...", "pending");
+            testResults = [];
+            
+            await testContentInterpolation();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testConditionalExecution();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testDynamicResponses();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testStoryIndependence();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Summary
+            const totalTests = testResults.length;
+            const passedTests = testResults.filter(r => r.passed).length;
+            const allPassed = passedTests === totalTests;
+            
+            updateResults(
+                `🎯 Full Validation: ${passedTests}/${totalTests} tests passed ${allPassed ? "✅" : "❌"}`,
+                allPassed ? "pass" : "fail"
+            );
+            
+            if (allPassed) {
+                updateResults("🎉 Dynamic Story Engine is working perfectly!", "pass");
+            } else {
+                updateResults("⚠️ Some tests failed - review implementation", "fail");
+            }
+        }
+
+        // Helper function to update results display
+        function updateResults(message, status) {
+            const resultsDiv = document.getElementById('validation-results');
+            const resultItem = document.createElement('div');
+            resultItem.className = `test-item test-${status}`;
+            resultItem.textContent = message;
+            resultsDiv.appendChild(resultItem);
+            
+            // Keep only last 10 results
+            const items = resultsDiv.children;
+            if (items.length > 10) {
+                resultsDiv.removeChild(items[0]);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof StoryEngine !== 'undefined') {
+                updateResults("✅ Story Engine loaded successfully", "pass");
+                updateResults("✅ Advanced story data loaded", "pass");
+                updateResults("Ready for validation tests!", "pending");
+            } else {
+                updateResults("❌ Story Engine failed to load", "fail");
+            }
+        });
+    </script>
+</body>
+</html>

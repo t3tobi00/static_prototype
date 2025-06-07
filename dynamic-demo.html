@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Story Engine Demo</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .demo-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border: 2px solid #007acc;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            min-width: 280px;
+        }
+        .demo-controls h3 {
+            margin-top: 0;
+            color: #007acc;
+            font-size: 16px;
+        }
+        .story-selector {
+            margin-bottom: 16px;
+        }
+        .story-selector select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .demo-button {
+            display: block;
+            width: 100%;
+            margin: 8px 0;
+            padding: 10px;
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .demo-button:hover {
+            background: #005999;
+        }
+        .demo-button.secondary {
+            background: #6c757d;
+        }
+        .demo-button.secondary:hover {
+            background: #545b62;
+        }
+        .demo-info {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 12px 0;
+            font-size: 12px;
+            border-left: 4px solid #007acc;
+        }
+        .interpolation-demo {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 8px 0;
+            font-family: monospace;
+            font-size: 11px;
+            border: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Header -->
+        <div id="header">
+            <h1 id="app-title">Dynamic Story Engine</h1>
+            <p id="app-subtitle">Showcasing Content Interpolation & Conditional Execution</p>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div id="main-content-area">
+            <!-- Left Pane -->
+            <div id="left-pane">
+                <div id="search-area">
+                    <div id="search-input-container">
+                        <div class="search-input-placeholder">Where would you like to go?</div>
+                    </div>
+                    <button id="search-action-button">Get Recommendations</button>
+                </div>
+                    
+                <div id="chat-messages">
+                    <!-- Welcome message -->
+                    <div class="chat-message ai-message">
+                        <div class="message-content">
+                            Hello! I'm here to help you plan your perfect getaway. What would you like to plan today?
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search Results Container -->
+                <div id="results-sidebar" style="display: none;">
+                    <div class="no-results-message">Search results will appear here.</div>
+                </div>
+            </div>
+            
+            <!-- Right Pane / Planning Canvas -->
+            <div id="right-pane" class="planning-canvas">
+                <!-- Plan Title Area -->
+                <div id="plan-title-area">
+                    <h2 id="plan-title-text">My Travel Plan</h2>
+                </div>
+                
+                <!-- Branch Container -->
+                <div id="branch-container">
+                    <div class="empty-plan-message">Your plan will appear here as you add items.</div>
+                </div>
+                
+                <button id="add-main-branch-button">+ Add Step to Plan</button>
+            </div>
+        </div>
+        
+        <!-- Story Narrator Section -->
+        <div id="story-narrator">
+            <p id="narration-text">Select a story and click 'Start Demo' to begin.</p>
+            <div class="narrator-buttons">
+                <button id="prev-step-button" style="visibility: hidden;">← Previous</button>
+                <button id="next-step-button">Next Step →</button>
+                <button id="restart-story-button" style="visibility: hidden;">↺ Restart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Controls -->
+    <div class="demo-controls">
+        <h3>🎭 Dynamic Story Demo</h3>
+        
+        <div class="story-selector">
+            <label>Choose Story:</label>
+            <select id="story-selector">
+                <option value="original">Original Story (Mountain Getaway)</option>
+                <option value="advanced">Advanced Story (Dynamic Variables)</option>
+            </select>
+        </div>
+        
+        <button class="demo-button" onclick="startSelectedStory()">🚀 Start Demo</button>
+        <button class="demo-button secondary" onclick="resetDemo()">🔄 Reset</button>
+        
+        <div class="demo-info">
+            <strong>🎯 What's New:</strong><br>
+            • Content interpolation with {{variables}}<br>
+            • Conditional step execution<br>
+            • Dynamic confirmation responses<br>
+            • Zero hardcoded content in engine
+        </div>
+        
+        <div class="interpolation-demo">
+            <strong>Example Variables:</strong><br>
+            {{userName}} → "Alex"<br>
+            {{tripType}} → "adventure"<br>
+            {{userDestination}} → "Swiss Alps"
+        </div>
+        
+        <button class="demo-button secondary" onclick="showEngineInfo()">📋 Engine Info</button>
+    </div>
+
+    <!-- Templates -->
+    <template id="result-card-template">
+        <div class="result-card">
+            <img src="" alt="Result Image" class="card-image">
+            <h3 class="card-title"></h3>
+            <p class="card-description"></p>
+            <p class="card-extra-info"></p>
+            <button class="export-to-plan-button">Export to Plan</button>
+        </div>
+    </template>
+    
+    <template id="branch-item-template">
+        <div class="branch-item" data-branch-id="">
+            <div class="branch-indent">
+                <span class="branch-connector"></span>
+                <span class="branch-toggle-icon">[&gt;]</span>
+            </div>
+            <div class="branch-content">
+                <div class="branch-text-area" contenteditable="true" placeholder="Enter your plan item..."></div>
+                <div class="branch-card-slot"></div>
+                <div class="branch-children"></div>
+                <button class="branch-search-icon" title="Search for recommendations">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Scripts -->
+    <script src="data/sample-data.js"></script>
+    <script src="data/sample-story.js"></script>
+    <script src="data/advanced-data.js"></script>
+    <script src="data/advanced-story.js"></script>
+    <script src="scripts/story-engine.js"></script>
+    
+    <script>
+        let currentStoryConfig = 'original';
+        
+        function startSelectedStory() {
+            const selector = document.getElementById('story-selector');
+            currentStoryConfig = selector.value;
+            
+            if (currentStoryConfig === 'advanced') {
+                StoryEngine.init(advancedStory, advancedTravelData);
+                document.getElementById('narration-text').textContent = 
+                    'Advanced story loaded with dynamic variables! Click "Next Step" to see content interpolation in action.';
+            } else {
+                StoryEngine.init(sampleStory, sampleData);
+                document.getElementById('narration-text').textContent = 
+                    'Original story loaded. Click "Next Step" to begin the demo.';
+            }
+        }
+        
+        function resetDemo() {
+            StoryEngine.restart();
+            document.getElementById('narration-text').textContent = 
+                'Demo reset. Select a story and click "Start Demo" to begin.';
+        }
+        
+        function showEngineInfo() {
+            const info = `
+🎯 Dynamic Story Engine Features:
+
+✅ Pure Execution Framework
+- Zero hardcoded story content
+- Story-agnostic architecture  
+- Reusable across any narrative type
+
+✅ Content Interpolation  
+- Use {{variableName}} in story content
+- Automatic variable replacement
+- Personalized messaging
+
+✅ Conditional Execution
+- Skip steps based on user choices
+- Dynamic story branching
+- Context-aware flow
+
+✅ Flexible Responses
+- Customizable confirmation dialogs
+- Story-specific messaging
+- Dynamic follow-up actions
+
+Current Story: ${currentStoryConfig === 'advanced' ? 'Advanced (Dynamic Variables)' : 'Original (Static Content)'}
+            `;
+            alert(info);
+        }
+        
+        // Initialize with original story by default
+        document.addEventListener('DOMContentLoaded', () => {
+            startSelectedStory();
+        });
+    </script>
+</body>
+</html>

@@ -197,9 +197,7 @@
             } catch (error) {
                 testResults.innerHTML = '<div class="test-status test-fail">✗ Complete flow test failed: ' + error.message + '</div>';
             }
-        }
-
-        function clearChat() {
+        }        function clearChat() {
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML = `
                 <div class="chat-message ai-message">
@@ -208,7 +206,6 @@
                     </div>
                 </div>
             `;
-            document.getElementById('results-sidebar').style.display = 'none';
             document.getElementById('test-results').innerHTML = '<div class="test-status test-pass">✓ Chat cleared</div>';
         }
 

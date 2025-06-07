@@ -190,13 +190,18 @@ const StoryEngine = (() => {
                 contentDiv.querySelector('.confirm-yes').addEventListener('click', () => resolve(true));
                 contentDiv.querySelector('.confirm-no').addEventListener('click', () => resolve(false));
             });
-        },
-
-        showResultsInChat: (results) => {
-            const resultsContainer = DOMUtils.getElement('#results-sidebar');
-            resultsContainer.innerHTML = '';
-            resultsContainer.style.display = 'block';
-            resultsContainer.classList.add('in-chat');
+        },        showResultsInChat: (results) => {
+            const chatMessages = DOMUtils.getElement('#chat-messages');
+            const resultsMessageDiv = document.createElement('div');
+            resultsMessageDiv.className = 'chat-message ai-message results-message';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content results-content';
+            resultsMessageDiv.appendChild(contentDiv);
+            
+            // Create results container inside the chat message
+            const resultsContainer = document.createElement('div');
+            resultsContainer.className = 'chat-results-container';
             
             results.forEach((result, index) => {
                 const resultCard = DOMUtils.createFromTemplate('result-card-template');
@@ -209,15 +214,30 @@ const StoryEngine = (() => {
                     // Add staggered animation
                     resultCard.style.opacity = '0';
                     resultCard.style.transform = 'translateY(20px)';
+                    resultCard.style.transition = 'all 0.3s ease';
                     
                     setTimeout(() => {
                         resultCard.style.opacity = '1';
                         resultCard.style.transform = 'translateY(0)';
-                    }, index * 100);
+                    }, index * 150);
                     
                     resultsContainer.appendChild(resultCard);
                 }
             });
+            
+            contentDiv.appendChild(resultsContainer);
+            chatMessages.appendChild(resultsMessageDiv);
+            
+            // Add slide-in animation for the entire results message
+            resultsMessageDiv.style.transform = 'translateY(20px)';
+            resultsMessageDiv.style.opacity = '0';
+            resultsMessageDiv.style.transition = 'all 0.3s ease';
+            
+            setTimeout(() => {
+                resultsMessageDiv.style.transform = 'translateY(0)';
+                resultsMessageDiv.style.opacity = '1';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 50);
         },
 
         createRippleEffect: (element, event) => {
@@ -568,14 +588,42 @@ const StoryEngine = (() => {
         }
     };
 
+    // --- Helper function for evaluating step conditions
+    const evaluateCondition = (condition) => {
+        switch (condition.type) {
+            case 'dataExists':
+                return currentData[condition.key] !== undefined;
+            case 'dataEquals':
+                return currentData[condition.key] === condition.value;
+            case 'confirmation':
+                return currentData.lastConfirmation === condition.value;
+            default:
+                return true;
+        }
+    };
+
     // --- Main Story Execution ---
     const executeStep = async (step) => {
         if (!step) return;
+
+        // Check for conditional execution
+        if (step.condition && !evaluateCondition(step.condition)) {
+            console.log(`Skipping step due to condition: ${step.condition.type}`);
+            return;
+        }
 
         // Hide any previous thought bubble before the next action (unless we're showing a thought bubble)
         if (step.action !== 'showThoughtBubble') {
             InteractionManager.hideThought();
         }
+
+        // Support for dynamic content interpolation
+        const interpolateContent = (content) => {
+            if (typeof content !== 'string') return content;
+            return content.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+                return currentData[key] || match;
+            });
+        };
 
         // This is our main "switch" that will grow over time
         switch (step.action) {
@@ -619,10 +667,9 @@ const StoryEngine = (() => {
                 undoStack.push(() => {
                     // The click effects are handled by other action undos
                 });
-                break;
-
-            case 'showAiThinking':
-                await InteractionManager.addChatMessage(step.text);
+                break;            case 'showAiThinking':
+                const thinkingMessage = interpolateContent(step.text);
+                await InteractionManager.addChatMessage(thinkingMessage);
                 // Add undo function
                 undoStack.push(() => {
                     // Can't easily undo chat messages, but we can track this
@@ -668,30 +715,23 @@ const StoryEngine = (() => {
                         }
                     });
                 }
-                break;
-
-            case 'showSidebarWithResults':
+                break;            case 'showSidebarWithResults':
                 const results = currentData[step.resultsDataKey];
-                if (results) {
-                    await InteractionManager.addChatMessage("I found some great options for your mountain getaway! Here are the best activities I discovered:");
+                if (results && step.message) {
+                    const resultsMessage = interpolateContent(step.message);
+                    await InteractionManager.addChatMessage(resultsMessage);
                     InteractionManager.showResultsInChat(results);
-                    SidebarManager.populateResults(results);
                     // Push undo function
                     undoStack.push(() => {
-                        const sidebar = DOMUtils.getElement('#results-sidebar');
-                        if (sidebar) {
-                            sidebar.innerHTML = '<p class="no-results-message">Search results will appear here.</p>';
-                            sidebar.style.display = 'none';
-                        }
+                        // Results are now part of chat messages, so no specific undo needed
+                        console.log("Results displayed in chat - undo not implemented");
                     });
                 }
-                break;
-
-            case 'embedCardInBranch':
+                break;case 'embedCardInBranch':
                 const cardData = currentData[step.cardDataKey];
                 if (cardData) {
-                    // Find source card and target slot for animation
-                    const sourceCard = document.querySelector('#results-sidebar .result-card:first-child');
+                    // Find source card from chat messages and target slot for animation
+                    const sourceCard = document.querySelector('.chat-results-container .result-card:first-child');
                     const targetBranch = DOMUtils.getElement(`[data-branch-id="${step.branchId}"]`);
                     const targetSlot = targetBranch ? targetBranch.querySelector('.branch-card-slot') : null;
                     
@@ -750,24 +790,26 @@ const StoryEngine = (() => {
                         });
                     }
                 }
-                break;
-
-            case 'showConfirmationDialog':
+                break;            case 'showConfirmationDialog':
                 const userConfirmed = await InteractionManager.showChatConfirmation(step.message);
                 // Store the confirmation result for potential use in next steps
                 currentData.lastConfirmation = userConfirmed;
-                if (userConfirmed) {
-                    await InteractionManager.addChatMessage("Perfect! Let me generate a detailed template for your mountain getaway plan.", false);
-                } else {
-                    await InteractionManager.addChatMessage("No problem! Your current plan looks great as is.", false);
+                
+                // Use dynamic responses from story data
+                if (step.confirmationResponses) {
+                    const responseMessage = userConfirmed 
+                        ? step.confirmationResponses.yes 
+                        : step.confirmationResponses.no;
+                    await InteractionManager.addChatMessage(responseMessage, false);
                 }
+                
                 undoStack.push(() => {
                     delete currentData.lastConfirmation;
                 });
-                break;
-
-            case 'showTemplateGenerationEffect':
-                await InteractionManager.addChatMessage("I'm analyzing your plan structure and generating comprehensive sub-branches with activities, logistics, and timing details...");
+                break;            case 'showTemplateGenerationEffect':
+                if (step.message) {
+                    await InteractionManager.addChatMessage(step.message);
+                }
                 undoStack.push(() => {
                     // No specific undo needed for chat messages
                 });

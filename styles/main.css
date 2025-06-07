@@ -1,0 +1,803 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* Color Palette Variables */
+:root {
+    --bg-primary: #1a1d21; /* A very dark, near-black charcoal */
+    --bg-secondary: #25282d; /* A slightly lighter charcoal for panes */
+    --surface-color: #31353c; /* For cards and interactive surfaces */
+    --border-color: #4a4e57; /* A visible but not harsh border */
+    
+    --primary-accent: #00A9FF; /* A vibrant, modern blue */
+    --primary-accent-hover: #0087cc;
+
+    --text-primary: #EAECEF; /* Off-white for high contrast */
+    --text-secondary: #A0A5B1; /* Lighter grey for descriptions, etc. */
+    --text-muted: #6f7581; /* For subtle hints and placeholder text */
+
+    --font-main: 'Inter', sans-serif;
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --shadow-focus: 0 0 0 3px rgba(0, 169, 255, 0.3); /* For focus rings */
+    
+    /* Keep legacy colors for compatibility */
+    --success-color: #28A745;
+    --warning-color: #FFC107;
+}
+
+/* App Container */
+#app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Main App UI */
+#main-app-ui {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 120px);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+/* Left Pane */
+#left-pane {
+    flex-basis: 30%;
+    min-width: 300px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+
+/* Search Area */
+#search-area {
+    margin-bottom: 15px;
+}
+
+#search-input-container {
+    margin-bottom: 10px;
+}
+
+.search-input-placeholder {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--surface-color);
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+#search-action-button {
+    padding: 8px 16px;
+    background-color: var(--primary-accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+#search-action-button:hover {
+    background-color: var(--primary-accent-hover);
+}
+
+/* Search Icon Styles */
+.branch-search-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary-accent);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.branch-search-icon:hover {
+    background: var(--primary-accent-hover);
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 169, 255, 0.3);
+}
+
+.branch-search-icon:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* Ripple Effect */
+.ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Results Sidebar */
+#results-sidebar {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* Chat Messages Container */
+#chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 16px 0;
+    max-height: 400px;
+}
+
+.chat-message {
+    margin-bottom: 16px;
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+.ai-message .message-content {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px 12px 12px 4px;
+    padding: 12px 16px;
+    margin-right: 40px;
+    position: relative;
+}
+
+.user-message .message-content {
+    background: var(--primary-accent);
+    color: white;
+    border-radius: 12px 12px 4px 12px;
+    padding: 12px 16px;
+    margin-left: 40px;
+    margin-right: 0;
+}
+
+.message-content {
+    font-size: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.no-results-message {
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Result Card */
+.result-card {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.card-image {
+    max-width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+}
+
+.card-description {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.card-extra-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 8px;
+}
+
+.export-to-plan-button {
+    margin-top: auto;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, var(--primary-accent), var(--primary-accent-hover));
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    transform: translateY(0);
+}
+
+.export-to-plan-button:hover {
+    background: linear-gradient(135deg, var(--primary-accent-hover), #0066cc);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 169, 255, 0.4);
+}
+
+.export-to-plan-button:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.export-to-plan-button.is-clicked {
+    animation: buttonClick 0.6s ease;
+}
+
+@keyframes buttonClick {
+    0% { transform: translateY(-2px) scale(1); }
+    25% { transform: translateY(-2px) scale(0.95); }
+    50% { transform: translateY(-1px) scale(1.05); }
+    100% { transform: translateY(-2px) scale(1); }
+}
+
+/* Right Pane / Planning Canvas */
+#right-pane {
+    flex-basis: 70%;
+    padding: 20px;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Plan Title Area */
+#plan-title-area {
+    margin-bottom: 20px;
+}
+
+#plan-title-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Branch Container */
+#branch-container {
+    margin-bottom: 20px;
+}
+
+.empty-plan-message {
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 40px 20px;
+    font-style: italic;
+    font-size: 16px;
+}
+
+/* Branch Item */
+.branch-item {
+    display: flex;
+    margin-bottom: 8px;
+    position: relative;
+    border-left: 2px solid transparent;
+}
+
+.branch-indent {
+    display: flex;
+    align-items: center;
+    width: 20px;
+}
+
+.branch-connector {
+    /* This will be styled by JS to create tree lines */
+    display: none; /* Hidden for now */
+}
+
+.branch-toggle-icon {
+    cursor: pointer;
+    color: var(--primary-accent);
+    font-weight: 600;
+    user-select: none;
+}
+
+.branch-toggle-icon:hover {
+    color: var(--primary-accent-hover);
+}
+
+.branch-content {
+    flex-grow: 1;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-right: 48px; /* Make room for search icon */
+}
+
+.branch-text-area {
+    min-height: 24px;
+    outline: none;
+    border: none;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text-primary);
+    padding-right: 8px; /* Additional spacing from search icon */
+}
+
+.branch-card-slot {
+    /* Empty by default, will be filled by JS */
+    min-height: 20px; /* Ensure some space for drop targets */
+}
+
+.branch-card-slot:not(:empty) {
+    margin-top: 8px;
+}
+
+.branch-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.branch-search-button,
+.add-sub-branch-button,
+.branch-more-options-button {
+    padding: 4px 8px;
+    font-size: 12px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.branch-search-button:hover,
+.add-sub-branch-button:hover,
+.branch-more-options-button:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.branch-children {
+    padding-left: 20px;
+    margin-top: 5px;
+}
+
+/* Add Main Branch Button */
+#add-main-branch-button {    padding: 12px 20px;
+    background-color: var(--primary-accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 20px;
+}
+
+#add-main-branch-button:hover {
+    background-color: var(--primary-accent-hover);
+}
+
+/* Story Narrator Section */
+#story-narrator {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--border-color);
+    padding: 15px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+#narration-text {
+    flex-grow: 1;
+    font-size: 16px;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.narrator-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#prev-step-button,
+#next-step-button,
+#restart-story-button {
+    padding: 8px 16px;
+    border: 1px solid var(--primary-accent);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    background-color: var(--surface-color);
+    color: var(--primary-accent);
+}
+
+#next-step-button {
+    background-color: var(--primary-accent);
+    color: white;
+}
+
+#prev-step-button:hover,
+#restart-story-button:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+#next-step-button:hover {
+    background-color: var(--primary-accent-hover);
+}
+
+/* LLM Chat Container */
+#llm-chat-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    max-width: 400px;
+    background: var(--surface-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+#llm-chat-container.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.llm-message {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px;
+    gap: 12px;
+}
+
+.llm-avatar {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.llm-content {
+    flex: 1;
+}
+
+.llm-text {
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.llm-typing-indicator {
+    display: flex;
+    gap: 4px;
+}
+
+.llm-typing-indicator span {
+    width: 6px;
+    height: 6px;
+    background: var(--primary-accent);
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.llm-typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.llm-typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 80%, 100% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Branch content positioning for search icon */
+.branch-content {
+    position: relative;
+    padding-right: 48px;
+}
+
+/* Card Dragging Animation */
+.result-card.is-dragging {
+    transform: rotate(5deg) scale(0.95);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.branch-card-slot.is-receiving {
+    background: rgba(0, 169, 255, 0.1);
+    border: 2px dashed var(--primary-accent);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px 0;
+    animation: receiveCard 0.5s ease;
+}
+
+@keyframes receiveCard {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+/* Placeholder styles for empty branches */
+.branch-placeholder {
+    background-color: var(--surface-color);
+    border: 1px dashed var(--border-color);
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+/* Focus Mode System */
+/* This backdrop will dim the rest of the app */
+#focus-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 100; /* Below focused elements but above the app */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#focus-backdrop.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* This class will be added by JS to elements we want to highlight */
+.is-in-focus {
+    position: relative;
+    z-index: 101; /* Above the backdrop */
+    box-shadow: var(--shadow-focus);
+    transition: box-shadow 0.3s ease;
+}
+
+/* Simulated Mouse Cursor */
+#simulated-cursor {
+    position: absolute;
+    z-index: 9999;
+    pointer-events: none;
+    transition: top 0.4s ease-out, left 0.4s ease-out, transform 0.1s ease-in-out;
+    transform-origin: top left;
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+}
+
+#simulated-cursor.is-visible {
+    opacity: 1;
+}
+
+#simulated-cursor.is-clicking {
+    transform: scale(0.8);
+}
+
+/* AI Thinking Indicator */
+#ai-thinking-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--primary-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Thought Bubble Narration */
+#thought-bubble {
+    position: absolute;
+    z-index: 9998;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    padding: 12px 16px;
+    border-radius: 8px;
+    max-width: 300px;
+    box-shadow: var(--shadow-soft);
+    opacity: 0;
+    transform: translateY(10px);
+    visibility: hidden;
+    transition: all 0.3s ease;
+    line-height: 1.5;
+}
+
+#thought-bubble.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+/* Add a triangle "tail" to the bubble */
+#thought-bubble::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+#thought-bubble.user-thought {
+    border-left: 3px solid var(--primary-accent);
+}
+
+#thought-bubble.ai-thought {
+    border-left: 3px solid var(--success-color);
+}
+
+/* Confirmation Dialog Buttons */
+#confirm-yes, #confirm-no {
+    transition: all 0.2s ease;
+}
+
+#confirm-yes:hover {
+    background: var(--primary-accent-hover) !important;
+    transform: translateY(-1px);
+}
+
+#confirm-no:hover {
+    background: #666 !important;
+    transform: translateY(-1px);
+}
+
+/* Confirmation buttons in chat */
+.confirmation-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.confirmation-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.confirm-yes {
+    background: var(--primary-accent);
+    color: white;
+}
+
+.confirm-yes:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.confirm-no {
+    background: var(--border-color);
+    color: var(--text-primary);
+}
+
+.confirm-no:hover {
+    background: var(--text-secondary);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Typing indicator for chat messages */
+.typing-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 0;
+}
+
+.typing-indicator span {
+    width: 6px;
+    height: 6px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    animation: typingDots 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingDots {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+    30% {
+        transform: translateY(-10px);
+        opacity: 1;
+    }
+}
+
+/* Chat message animations */
+.chat-message {
+    animation: messageSlideIn 0.3s ease-out;
+    transition: all 0.3s ease;
+}
+
+/* Results sidebar when in chat mode */
+#results-sidebar.in-chat {
+    border-top: 1px solid var(--border-color);
+    margin-top: 16px;
+    padding-top: 16px;
+}

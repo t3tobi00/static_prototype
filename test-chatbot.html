@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Weaver Chatbot Test</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .test-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background: #005999;
+        }
+        .test-status {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .test-pass { background: #d4edda; color: #155724; }
+        .test-fail { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Header remains unchanged -->
+        <div id="header">
+            <h1 id="app-title">Story Weaver</h1>
+            <p id="app-subtitle">Plan Your Perfect Getaway</p>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div id="main-content-area">
+            <!-- Left Pane -->
+            <div id="left-pane">
+                <div id="search-area">
+                    <div id="search-input-container">
+                        <div class="search-input-placeholder">Where would you like to go?</div>
+                    </div>
+                    <button id="search-action-button">Get Recommendations</button>
+                </div>
+                    
+                <div id="chat-messages">
+                    <!-- Welcome message -->
+                    <div class="chat-message ai-message">
+                        <div class="message-content">
+                            Hello! I'm here to help you plan your perfect getaway. What would you like to plan today?
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search Results Container -->
+                <div id="results-sidebar" style="display: none;">
+                    <div class="no-results-message">Search results will appear here.</div>
+                </div>
+            </div>
+            
+            <!-- Right Pane / Planning Canvas -->
+            <div id="right-pane" class="planning-canvas">
+                <!-- Plan Title Area -->
+                <div id="plan-title-area">
+                    <h2 id="plan-title-text">My Travel Plan</h2>
+                </div>
+                
+                <!-- Branch Container -->
+                <div id="branch-container">
+                    <div class="empty-plan-message">Your plan will appear here as you add items.</div>
+                </div>
+                
+                <button id="add-main-branch-button">+ Add Step to Plan</button>
+            </div>
+        </div>
+        
+        <!-- Story Narrator Section -->
+        <div id="story-narrator">
+            <p id="narration-text">Testing chatbot integration...</p>
+        </div>
+    </div>
+
+    <!-- Test Controls -->
+    <div class="test-controls">
+        <h3>Chatbot Tests</h3>
+        <button class="test-button" onclick="testAddChatMessage()">Test Add Chat Message</button>
+        <button class="test-button" onclick="testTypingAnimation()">Test Typing Animation</button>
+        <button class="test-button" onclick="testConfirmationDialog()">Test Confirmation Dialog</button>
+        <button class="test-button" onclick="testResultsDisplay()">Test Results Display</button>
+        <button class="test-button" onclick="testCompleteFlow()">Test Complete Flow</button>
+        <button class="test-button" onclick="clearChat()">Clear Chat</button>
+        <div id="test-results"></div>
+    </div>
+
+    <script src="scripts/story-engine.js"></script>
+    <script>
+        // Test functions for chatbot integration
+        async function testAddChatMessage() {
+            const testResults = document.getElementById('test-results');
+            try {
+                await StoryEngine.interactionManager.addChatMessage("Test message from AI", false);
+                testResults.innerHTML = '<div class="test-status test-pass">✓ addChatMessage() works</div>';
+            } catch (error) {
+                testResults.innerHTML = '<div class="test-status test-fail">✗ addChatMessage() failed: ' + error.message + '</div>';
+            }
+        }
+
+        async function testTypingAnimation() {
+            const testResults = document.getElementById('test-results');
+            try {
+                await StoryEngine.interactionManager.addChatMessage("This message should appear with typing animation...", false);
+                testResults.innerHTML = '<div class="test-status test-pass">✓ Typing animation works</div>';
+            } catch (error) {
+                testResults.innerHTML = '<div class="test-status test-fail">✗ Typing animation failed: ' + error.message + '</div>';
+            }
+        }
+
+        async function testConfirmationDialog() {
+            const testResults = document.getElementById('test-results');
+            try {
+                const result = await StoryEngine.interactionManager.showChatConfirmation("Would you like to continue with this test?");
+                testResults.innerHTML = '<div class="test-status test-pass">✓ Confirmation dialog works - User chose: ' + (result ? 'Yes' : 'No') + '</div>';
+            } catch (error) {
+                testResults.innerHTML = '<div class="test-status test-fail">✗ Confirmation dialog failed: ' + error.message + '</div>';
+            }
+        }
+
+        async function testResultsDisplay() {
+            const testResults = document.getElementById('test-results');
+            try {
+                const mockResults = [
+                    {
+                        title: "Test Location 1",
+                        description: "A beautiful test destination",
+                        image: "https://via.placeholder.com/300x200",
+                        extraInfo: "Test info"
+                    },
+                    {
+                        title: "Test Location 2", 
+                        description: "Another amazing test spot",
+                        image: "https://via.placeholder.com/300x200",
+                        extraInfo: "More test info"
+                    }
+                ];
+                StoryEngine.interactionManager.showResultsInChat(mockResults);
+                testResults.innerHTML = '<div class="test-status test-pass">✓ Results display works</div>';
+            } catch (error) {
+                testResults.innerHTML = '<div class="test-status test-fail">✗ Results display failed: ' + error.message + '</div>';
+            }
+        }
+
+        async function testCompleteFlow() {
+            const testResults = document.getElementById('test-results');
+            testResults.innerHTML = '<div class="test-status">Running complete flow test...</div>';
+            
+            try {
+                await StoryEngine.interactionManager.addChatMessage("Let me help you find some great destinations...", false);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const mockResults = [
+                    {
+                        title: "Paris, France",
+                        description: "The City of Light awaits with its romantic ambiance",
+                        image: "https://via.placeholder.com/300x200/ff6b6b/ffffff?text=Paris",
+                        extraInfo: "Best time to visit: Spring & Fall"
+                    }
+                ];
+                
+                StoryEngine.interactionManager.showResultsInChat(mockResults);
+                
+                const userChoice = await StoryEngine.interactionManager.showChatConfirmation("Would you like to add Paris to your travel plan?");
+                
+                if (userChoice) {
+                    await StoryEngine.interactionManager.addChatMessage("Great choice! I've added Paris to your plan.", false);
+                } else {
+                    await StoryEngine.interactionManager.addChatMessage("No problem! Let me know if you'd like other suggestions.", false);
+                }
+                
+                testResults.innerHTML = '<div class="test-status test-pass">✓ Complete flow test successful</div>';
+            } catch (error) {
+                testResults.innerHTML = '<div class="test-status test-fail">✗ Complete flow test failed: ' + error.message + '</div>';
+            }
+        }
+
+        function clearChat() {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = `
+                <div class="chat-message ai-message">
+                    <div class="message-content">
+                        Hello! I'm here to help you plan your perfect getaway. What would you like to plan today?
+                    </div>
+                </div>
+            `;
+            document.getElementById('results-sidebar').style.display = 'none';
+            document.getElementById('test-results').innerHTML = '<div class="test-status test-pass">✓ Chat cleared</div>';
+        }
+
+        // Initialize the story engine
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof StoryEngine !== 'undefined') {
+                StoryEngine.init();
+                document.getElementById('test-results').innerHTML = '<div class="test-status test-pass">✓ Story Engine initialized</div>';
+            } else {
+                document.getElementById('test-results').innerHTML = '<div class="test-status test-fail">✗ Story Engine not found</div>';
+            }
+        });
+    </script>
+</body>
+</html>

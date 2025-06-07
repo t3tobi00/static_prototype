@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Weaver: Agentic Planner Prototype</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="focus-backdrop"></div>
+    <div id="app-container">
+        <!-- Main App UI Container -->
+        <div id="main-app-ui">
+            <!-- Left Pane -->            <div id="left-pane">
+                <!-- Chatbot Interface -->
+                <div id="chatbot-container">
+                    <div id="chatbot-header">
+                        <div class="ai-avatar">🤖</div>
+                        <div class="ai-name">AI Assistant</div>
+                    </div>
+                    
+                    <div id="chat-messages">
+                        <!-- Welcome message -->
+                        <div class="chat-message ai-message">
+                            <div class="message-content">
+                                Hello! I'm here to help you plan your perfect getaway. What would you like to plan today?
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Search Results Container (will be populated by AI) -->
+                    <div id="results-sidebar" style="display: none;">
+                        <div class="no-results-message">Search results will appear here.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Pane / Planning Canvas -->
+            <div id="right-pane" class="planning-canvas">
+                <!-- Plan Title Area -->
+                <div id="plan-title-area" style="display: none;">
+                    <h2 id="plan-title-text"></h2>
+                </div>
+                  <!-- Branch Container -->
+                <div id="branch-container">
+                    <div id="initial-plan-prompt" class="branch-item-placeholder">What are you planning?</div>
+                </div>
+                
+                <!-- Add Main Branch Button -->
+                <button id="add-main-branch-button">+ Add Step to Plan</button>
+            </div>        </div>
+        
+        <!-- Simulated Mouse Cursor -->
+        <div id="simulated-cursor">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.293 21.707L13.586 14.414L10 10.828L2.293 18.535C1.902 18.926 1.902 19.559 2.293 19.95L4.05 21.707C4.441 22.098 5.074 22.098 5.465 21.707H6.293ZM21.707 5.465L19.95 4.05C19.559 3.659 18.926 3.659 18.535 4.05L12 10.586L15.586 14.172L21.707 8.05C22.098 7.659 22.098 6.074 21.707 5.465Z" fill="var(--primary-accent)"/>
+            </svg>
+        </div>
+          <!-- LLM Chat Container -->
+        <div id="llm-chat-container" style="display: none;">
+            <div class="llm-message">
+                <div class="llm-avatar">🤖</div>
+                <div class="llm-content">
+                    <div class="llm-text"></div>
+                    <div class="llm-typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Story Narrator Section -->
+        <div id="story-narrator">
+            <p id="narration-text">Welcome! Click 'Next Step' to begin the demo.</p>
+            <div class="narrator-buttons">
+                <button id="prev-step-button" style="visibility: hidden;">← Previous</button>
+                <button id="next-step-button">Next Step →</button>
+                <button id="restart-story-button" style="visibility: hidden;">↺ Restart</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Templates -->
+    <template id="result-card-template">
+        <div class="result-card">
+            <img src="" alt="Result Image" class="card-image">
+            <h3 class="card-title"></h3>
+            <p class="card-description"></p>
+            <p class="card-extra-info"></p>
+            <button class="export-to-plan-button">Export to Plan</button>
+        </div>
+    </template>
+    
+    <template id="branch-item-template">
+        <div class="branch-item" data-branch-id="">
+            <div class="branch-indent">
+                <span class="branch-connector"></span>
+                <span class="branch-toggle-icon">[&gt;]</span>
+            </div>            <div class="branch-content">
+                <div class="branch-text-area" contenteditable="false"></div>
+                <button class="branch-search-icon" title="Search for suggestions">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                        <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <div class="ripple-effect"></div>
+                </button>
+                <div class="branch-card-slot"></div>
+                <div class="branch-actions" style="display:none;">
+                    <button class="branch-search-button">🔍 Search</button>
+                    <button class="add-sub-branch-button">+ Sub-branch</button>
+                    <button class="branch-more-options-button">...</button>
+                </div>
+            </div>
+            <div class="branch-children" style="display:none;"></div>
+        </div>
+    </template>
+      <!-- Scripts -->
+    <script src="data/sample-data.js"></script>
+    <script src="data/sample-story.js"></script>
+    <script src="scripts/story-engine.js"></script>
+    <script src="scripts/main-story-player.js"></script>
+</body>
+</html>
